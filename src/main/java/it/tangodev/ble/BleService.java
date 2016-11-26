@@ -77,17 +77,7 @@ public class BleService implements GattService1, Properties {
 		externalMap.put(GATT_SERVICE_INTERFACE, serviceMap);
 		
 		return externalMap;
-//		return {
-//            GATT_SERVICE_IFACE: {
-//                    'UUID': self.uuid,
-//                    'Primary': self.primary,
-//                    'Characteristics': dbus.Array(
-//                            self.get_characteristic_paths(),
-//                            signature='o')
-//            }
-//    }
-		
-	}
+}
 	
 	public Boolean isPrimary() {
 		return primary != null && primary;

@@ -42,8 +42,6 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 	}
 	
 	public void addService(BleService service) {
-//		String servicePath = service.getPath().toString();
-//		this.servicesUUIDs.add(servicePath);
 		this.servicesUUIDs.add(service.getUuid());
 	}
 	

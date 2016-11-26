@@ -63,7 +63,7 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		Variant<String[]> flagsProperty = new Variant<String[]>(Utils.getStringArrayFromList(this.flags));
 		characteristicMap.put(CHARACTERISTIC_FLAGS_PROPERTY_KEY, flagsProperty);
 		
-		// TODO Nessun Descriptors
+		// TODO manage Descriptors
 		Variant<Path[]> descriptorsPatProperty = new Variant<Path[]>(new Path[0]);
 		characteristicMap.put(CHARACTERISTIC_DESCRIPTORS_PROPERTY_KEY, descriptorsPatProperty);
 		
@@ -71,17 +71,6 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		externalMap.put(GATT_CHARACTERISTIC_INTERFACE, characteristicMap);
 		
 		return externalMap;
-//		return {
-//            GATT_CHRC_IFACE: {
-//                    'Service': self.service.get_path(),
-//                    'UUID': self.uuid,
-//                    'Flags': self.flags,
-//                    'Descriptors': dbus.Array(
-//                            self.get_descriptor_paths(),
-//                            signature='o')
-//            }
-//		}
-		
 	}
 	
 	@Override
