@@ -8,6 +8,7 @@ import java.util.Map;
 import org.bluez.GattApplication1;
 import org.bluez.GattManager1;
 import org.bluez.LEAdvertisingManager1;
+import org.dbus.ObjectManager;
 import org.freedesktop.DBus.Properties;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.Path;
@@ -18,6 +19,8 @@ public class BleApplication implements GattApplication1 {
 
 	public static final String BLUEZ_DBUS_BUSNAME = "org.bluez";
 	public static final String BLUEZ_ADAPTER_INTERFACE = "org.bluez.Adapter1";
+	public static final String BLUEZ_GATT_INTERFACE = "org.bluez.GattManager1";
+	public static final String BLUEZ_LE_ADV_INTERFACE = "org.bluez.LEAdvertisingManager1";
 	
 	private List<BleService> servicesList = new ArrayList<BleService>();
 	private String path = "/it/tangodev/openlaptimer";
@@ -30,14 +33,17 @@ public class BleApplication implements GattApplication1 {
 	public void start() throws DBusException, InterruptedException {
 		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 		
+		String adapterPath = findAdapterPath();
+		if(adapterPath == null) { throw new RuntimeException("No BLE adapter found"); }
+		
 		this.export(dbusConnection);
 		
-		Properties adapterProperties = (Properties) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/org/bluez/hci0", Properties.class);
+		Properties adapterProperties = (Properties) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, Properties.class);
 		adapterProperties.Set(BLUEZ_ADAPTER_INTERFACE, "Powered", new Variant<Boolean>(true));
 		
-		GattManager1 m = (GattManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/org/bluez/hci0", GattManager1.class);
+		GattManager1 m = (GattManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, GattManager1.class);
 		
-		LEAdvertisingManager1 advManager = (LEAdvertisingManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/org/bluez/hci0", LEAdvertisingManager1.class);
+		LEAdvertisingManager1 advManager = (LEAdvertisingManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, LEAdvertisingManager1.class);
 
 		BleAdvertisement adv = new BleAdvertisement(BleAdvertisement.ADVERTISEMENT_TYPE_PERIPHERAL);
 		for (BleService service : servicesList) {
@@ -67,6 +73,35 @@ public class BleApplication implements GattApplication1 {
 	
 	public void removeService(BleService service) {
 		this.servicesList.remove(service);
+	}
+	
+	/**
+	 * Search for a Adapter that has GattManager1 and LEAdvertisement1 interfaces, otherwise return null.
+	 * @return
+	 * @throws DBusException
+	 */
+	public static String findAdapterPath() throws DBusException {
+		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
+		ObjectManager bluezObjectManager = (ObjectManager) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/", ObjectManager.class);
+		if(bluezObjectManager == null) { return null; }
+		
+		Map<Path, Map<String, Map<String, Variant>>> bluezManagedObject = bluezObjectManager.GetManagedObjects();
+		if(bluezManagedObject == null) { return null; }
+		
+		for (Path path : bluezManagedObject.keySet()) {
+			Map<String, Map<String, Variant>> value = bluezManagedObject.get(path);
+			boolean hasGattManager = false;
+			boolean hasAdvManager = false;
+			
+			for(String key : value.keySet()) {
+				if(key.equals(BLUEZ_GATT_INTERFACE)) { hasGattManager = true; }
+				if(key.equals(BLUEZ_LE_ADV_INTERFACE)) { hasAdvManager = true; }
+				
+				if(hasGattManager && hasAdvManager) { return path.toString(); }
+			}
+		}
+		
+		return null;
 	}
 	
 	@Override

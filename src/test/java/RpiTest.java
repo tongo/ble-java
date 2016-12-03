@@ -1,17 +1,22 @@
+import java.util.Map;
+
 import it.tangodev.ble.BleApplication;
 
+import org.dbus.ObjectManager;
+import org.freedesktop.DBus;
+import org.freedesktop.dbus.DBusConnection;
+import org.freedesktop.dbus.Path;
+import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
 
 public class RpiTest {
 	
 	public static void main(String[] args) throws DBusException, InterruptedException {
-		
+//		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 //		DBus dbus = dbusConnection.getRemoteObject("org.freedesktop.DBus", "/or/freedesktop/DBus", DBus.class);
 //		String bluezDbusBusName = dbus.GetNameOwner("org.bluez");
 //		Introspectable i = (Introspectable) dbusConnection.getRemoteObject("org.bluez", "/org/bluez/hci0", Introspectable.class);
 //		System.out.println(i.Introspect());
-		
-//		ObjectManager bluezObjectManager = (ObjectManager) dbusConnection.getRemoteObject("org.bluez", "/", ObjectManager.class);
 		
 //		Properties adapterProperties = (Properties) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/org/bluez/hci0", Properties.class);
 //		adapterProperties.Set(BLUEZ_ADAPTER_INTERFACE, "Powered", new Variant<Boolean>(true));
