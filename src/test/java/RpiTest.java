@@ -1,8 +1,13 @@
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import it.tangodev.ble.BleApplication;
+import it.tangodev.ble.BleCharacteristic;
+import it.tangodev.utils.Utils;
 
 import org.dbus.ObjectManager;
+import org.dbus.PropertiesChangedSignal.PropertiesChanged;
 import org.freedesktop.DBus;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.Path;
@@ -12,7 +17,10 @@ import org.freedesktop.dbus.exceptions.DBusException;
 public class RpiTest {
 	
 	public static void main(String[] args) throws DBusException, InterruptedException {
-//		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
+		
+		
+		
+		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 //		DBus dbus = dbusConnection.getRemoteObject("org.freedesktop.DBus", "/or/freedesktop/DBus", DBus.class);
 //		String bluezDbusBusName = dbus.GetNameOwner("org.bluez");
 //		Introspectable i = (Introspectable) dbusConnection.getRemoteObject("org.bluez", "/org/bluez/hci0", Introspectable.class);
@@ -35,8 +43,25 @@ public class RpiTest {
 //		Map<String, Variant> appOptions = new HashMap<String, Variant>();
 //		m.RegisterApplication(application, appOptions);
 		
-		
 		application.start();
+		
+//		String characteristicPath = "/it/tangodev/openlaptimer/service/characteristic";
+//		
+		byte[] value = new byte[2];
+		value[0] = 'a';
+		value[1] = 'a';
+//		
+//		Variant<byte[]> signalValueVariant = new Variant<byte[]>(value);
+//		Map<String, Variant> signalValue = new HashMap<String, Variant>();
+//		signalValue.put(BleCharacteristic.CHARACTERISTIC_VALUE_PROPERTY_KEY, signalValueVariant);
+//		
+//		PropertiesChanged signal = new PropertiesChanged(characteristicPath, signalValue, new ArrayList<String>());
+//		dbusConnection.sendSignal(signal);
+		
+		BleCharacteristic characteristic = application.getServicesList().get(0).getCharacteristics().get(0);
+		characteristic.StartNotify();
+		characteristic.sendNotification(value);
+		
 		System.out.println("FINE");
 	}
 

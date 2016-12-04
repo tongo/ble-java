@@ -75,6 +75,10 @@ public class BleApplication implements GattApplication1 {
 		this.servicesList.remove(service);
 	}
 	
+	public List<BleService> getServicesList() {
+		return servicesList;
+	}
+
 	/**
 	 * Search for a Adapter that has GattManager1 and LEAdvertisement1 interfaces, otherwise return null.
 	 * @return
