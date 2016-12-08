@@ -26,19 +26,46 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	public static final String CHARACTERISTIC_VALUE_PROPERTY_KEY = "Value";
 	
 	private BleService service = null;
-	private String uuid = "0000180d-0000-1000-8000-00805f9b34fb";
+	private String uuid = null;
 	private List<String> flags;
-	private String path = "/it/tangodev/openlaptimer/service/characteristic";
+	private String path = null;
 	private boolean isNotifying = false;
-	private byte[] value;
+//	private byte[] value;
+	private CharacteristicListener listener;
 	
-	public BleCharacteristic(BleService service) {
-		flags = new ArrayList<String>();
-		flags.add("read");
-		flags.add("write");
-		flags.add("notify");
+	public enum CharacteristicFlag {
+		READ("read"),
+		WRITE("write"),
+		NOTIFY("notify");
 		
+		private String flag;
+		
+		CharacteristicFlag(String flag) {
+			this.flag = flag;
+		}
+		
+		public static CharacteristicFlag fromString(String flag) {
+			for (CharacteristicFlag t : CharacteristicFlag.values()) {
+				if (flag.equalsIgnoreCase(t.flag)) { return t; }
+			}
+			throw new RuntimeException("Specified Characteristic Flag not valid [" + flag + "]");
+		}
+		
+		@Override
+		public String toString() {
+			return this.flag;
+		}
+	}
+	
+	public BleCharacteristic(String path, BleService service, List<CharacteristicFlag> flags, String uuId, CharacteristicListener listener) {
+		this.path = path;
 		this.service = service;
+		this.uuid = uuId;
+		this.flags = new ArrayList<String>();
+		for (CharacteristicFlag characteristicFlag : flags) {
+			this.flags.add(characteristicFlag.toString());
+		}
+		this.listener = listener;
 	}
 	
 	public void export(DBusConnection dbusConnection) throws DBusException {
@@ -73,13 +100,14 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		return externalMap;
 	}
 	
-	public void sendNotification(byte[] newValue) {
-		this.value = newValue;
+	public void sendNotification() {
+//		this.value = newValue;
 		
 		try {
 			DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 			
-			Variant<byte[]> signalValueVariant = new Variant<byte[]>(this.value);
+//			Variant<byte[]> signalValueVariant = new Variant<byte[]>(this.value);
+			Variant<byte[]> signalValueVariant = new Variant<byte[]>(listener.getValue());
 			Map<String, Variant> signalValue = new HashMap<String, Variant>();
 			signalValue.put(BleCharacteristic.CHARACTERISTIC_VALUE_PROPERTY_KEY, signalValueVariant);
 			
@@ -98,16 +126,17 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	@Override
 	public byte[] ReadValue(Map<String, Variant> option) {
 		System.out.println("Characteristic Read option[" + option + "]");
-		
 //		byte[] b = value.getBytes(Charset.forName("ASCII"));
-		return value;
+//		return value;
+		return listener.getValue();
 	}
 
 	@Override
 	public void WriteValue(byte[] value, Map<String, Variant> option) {
 		System.out.println("Characteristic Write option[" + option + "]");
 //		this.value = new String(value, Charset.forName("ASCII"));
-		this.value = value;
+//		this.value = value;
+		listener.setValue(value);
 	}
 
 	@Override

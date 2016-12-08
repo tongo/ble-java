@@ -23,11 +23,10 @@ public class BleApplication implements GattApplication1 {
 	public static final String BLUEZ_LE_ADV_INTERFACE = "org.bluez.LEAdvertisingManager1";
 	
 	private List<BleService> servicesList = new ArrayList<BleService>();
-	private String path = "/it/tangodev/openlaptimer";
+	private String path = null;
 	
-	public BleApplication() {
-		BleService service = new BleService();
-		servicesList.add(service);
+	public BleApplication(String path) {
+		this.path = path;
 	}
 	
 	public void start() throws DBusException, InterruptedException {

@@ -19,14 +19,17 @@ public class BleService implements GattService1, Properties {
 	private static final String SERVICE_PRIMARY_PROPERTY_KEY = "Primary";
 	private static final String SERVICE_CHARACTERISTIC_PROPERTY_KEY = "Characteristics";
 	
-	private String uuid = "0000180d-0000-1000-8000-00805f9b34fb";
+	private String uuid = null;
 	private Boolean primary = true;
 	private List<BleCharacteristic> characteristics = new ArrayList<BleCharacteristic>();
-	private String path = "/it/tangodev/openlaptimer/service";
+	private String path = null;
 	
-	public BleService() {
-		BleCharacteristic c = new BleCharacteristic(this);
-		characteristics.add(c);
+	public BleService() { }
+	
+	public BleService(String path, String uuId, Boolean primary) {
+		this.path = path;
+		this.uuid = uuId;
+		this.primary = primary;
 	}
 	
 	public void addCharacteristic(BleCharacteristic characteristic) {
