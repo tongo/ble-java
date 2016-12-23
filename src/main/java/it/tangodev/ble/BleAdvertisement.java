@@ -36,8 +36,9 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 	
 	private String path = "/it/tangodev/openlaptimer/advertisement";
 	
-	public BleAdvertisement(String type) {
+	public BleAdvertisement(String type, String path) {
 		this.type = type;
+		this.path = path;
 		this.servicesUUIDs = new ArrayList<String>();
 	}
 	

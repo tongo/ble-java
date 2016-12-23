@@ -44,7 +44,8 @@ public class BleApplication implements GattApplication1 {
 		
 		LEAdvertisingManager1 advManager = (LEAdvertisingManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, LEAdvertisingManager1.class);
 
-		BleAdvertisement adv = new BleAdvertisement(BleAdvertisement.ADVERTISEMENT_TYPE_PERIPHERAL);
+		String advPath = path + "/advertisement";
+		BleAdvertisement adv = new BleAdvertisement(BleAdvertisement.ADVERTISEMENT_TYPE_PERIPHERAL, advPath);
 		for (BleService service : servicesList) {
 			if(service.isPrimary()) {
 				adv.addService(service);

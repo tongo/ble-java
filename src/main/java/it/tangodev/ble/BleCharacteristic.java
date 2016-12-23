@@ -26,12 +26,12 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	public static final String CHARACTERISTIC_VALUE_PROPERTY_KEY = "Value";
 	
 	private BleService service = null;
-	private String uuid = null;
-	private List<String> flags;
-	private String path = null;
+	protected String uuid = null;
+	private List<String> flags = new ArrayList<String>();;
+	protected String path = null;
 	private boolean isNotifying = false;
 //	private byte[] value;
-	private CharacteristicListener listener;
+	protected CharacteristicListener listener;
 	
 	public enum CharacteristicFlag {
 		READ("read"),
@@ -56,16 +56,22 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 			return this.flag;
 		}
 	}
+	public BleCharacteristic(BleService service) {
+		this.service = service;
+	}
 	
 	public BleCharacteristic(String path, BleService service, List<CharacteristicFlag> flags, String uuId, CharacteristicListener listener) {
 		this.path = path;
 		this.service = service;
 		this.uuid = uuId;
-		this.flags = new ArrayList<String>();
+		setFlags(flags);
+		this.listener = listener;
+	}
+	
+	public void setFlags(List<CharacteristicFlag> flags) {
 		for (CharacteristicFlag characteristicFlag : flags) {
 			this.flags.add(characteristicFlag.toString());
 		}
-		this.listener = listener;
 	}
 	
 	public void export(DBusConnection dbusConnection) throws DBusException {

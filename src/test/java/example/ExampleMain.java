@@ -52,12 +52,16 @@ public class ExampleMain implements Runnable {
 		});
 		service.addCharacteristic(characteristic);
 		app.addService(service);
+		
+		ExampleCharacteristic exampleCharacteristic = new ExampleCharacteristic(service);
+		service.addCharacteristic(exampleCharacteristic);
+		app.start();
 	}
 
 	@Override
 	public void run() {
 		try {
-			app.start();
+			
 			this.wait();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -66,12 +70,13 @@ public class ExampleMain implements Runnable {
 	
 	public static void main(String[] args) throws DBusException, InterruptedException {
 		ExampleMain example = new ExampleMain();
-		Thread t = new Thread(example);
-		t.start();
-		Thread.sleep(15000);
-		example.notifyBle("woooooo");
-		Thread.sleep(15000);
-		t.notify();
+		System.out.println("");
+//		Thread t = new Thread(example);
+//		t.start();
+//		Thread.sleep(15000);
+//		example.notifyBle("woooooo");
+//		Thread.sleep(15000);
+//		t.notify();
 	}
 	
 }
