@@ -61,7 +61,6 @@ public class ExampleMain implements Runnable {
 	@Override
 	public void run() {
 		try {
-			
 			this.wait();
 		} catch (Exception e) {
 			e.printStackTrace();

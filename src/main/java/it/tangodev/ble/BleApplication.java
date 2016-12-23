@@ -24,6 +24,10 @@ public class BleApplication implements GattApplication1 {
 	
 	private List<BleService> servicesList = new ArrayList<BleService>();
 	private String path = null;
+	private String adapterPath;
+	private BleService advService;
+	private BleAdvertisement adv;
+	private String adapterAlias;
 	
 	public BleApplication(String path) {
 		this.path = path;
@@ -32,23 +36,28 @@ public class BleApplication implements GattApplication1 {
 	public void start() throws DBusException, InterruptedException {
 		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 		
-		String adapterPath = findAdapterPath();
+		adapterPath = findAdapterPath();
 		if(adapterPath == null) { throw new RuntimeException("No BLE adapter found"); }
 		
 		this.export(dbusConnection);
 		
 		Properties adapterProperties = (Properties) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, Properties.class);
 		adapterProperties.Set(BLUEZ_ADAPTER_INTERFACE, "Powered", new Variant<Boolean>(true));
+		if(adapterAlias != null) {
+			adapterProperties.Set(BLUEZ_ADAPTER_INTERFACE, "Alias", new Variant<String>(adapterAlias));
+		}
 		
-		GattManager1 m = (GattManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, GattManager1.class);
+		GattManager1 gattManager = (GattManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, GattManager1.class);
 		
 		LEAdvertisingManager1 advManager = (LEAdvertisingManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, LEAdvertisingManager1.class);
 
 		String advPath = path + "/advertisement";
-		BleAdvertisement adv = new BleAdvertisement(BleAdvertisement.ADVERTISEMENT_TYPE_PERIPHERAL, advPath);
+		adv = new BleAdvertisement(BleAdvertisement.ADVERTISEMENT_TYPE_PERIPHERAL, advPath);
 		for (BleService service : servicesList) {
 			if(service.isPrimary()) {
+				advService = service;
 				adv.addService(service);
+				break;
 			}
 		}
 		adv.export(dbusConnection);
@@ -57,7 +66,21 @@ public class BleApplication implements GattApplication1 {
 		advManager.RegisterAdvertisement(adv, advOptions);
 		
 		Map<String, Variant> appOptions = new HashMap<String, Variant>();
-		m.RegisterApplication(this, appOptions);
+		gattManager.RegisterApplication(this, appOptions);
+	}
+	
+	public void stop() throws DBusException, InterruptedException {
+		if(adapterPath == null) { return; }
+		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
+		GattManager1 gattManager = (GattManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, GattManager1.class);
+		LEAdvertisingManager1 advManager = (LEAdvertisingManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, LEAdvertisingManager1.class);
+		
+		if(adv != null) { advManager.UnregisterAdvertisement(adv); }
+		gattManager.UnregisterApplication(this);
+	}
+	
+	public void setAdapterAlias(String alias) {
+		adapterAlias = alias;
 	}
 	
 	public void export(DBusConnection dbusConnection) throws DBusException {
