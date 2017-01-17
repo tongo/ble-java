@@ -3,6 +3,7 @@ package it.tangodev.ble;
 import it.tangodev.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.dbus.PropertiesChangedSignal.PropertiesChanged;
 import org.freedesktop.DBus.Properties;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.Path;
+import org.freedesktop.dbus.UInt16;
 import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
 
@@ -30,7 +32,7 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	private List<String> flags = new ArrayList<String>();;
 	protected String path = null;
 	private boolean isNotifying = false;
-//	private byte[] value;
+//	private byte[] value = new byte[0];
 	protected CharacteristicListener listener;
 	
 	public enum CharacteristicFlag {
@@ -96,6 +98,9 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		Variant<String[]> flagsProperty = new Variant<String[]>(Utils.getStringArrayFromList(this.flags));
 		characteristicMap.put(CHARACTERISTIC_FLAGS_PROPERTY_KEY, flagsProperty);
 		
+//		Variant<byte[]> valueProperty = new Variant<byte[]>(this.value);
+//		characteristicMap.put(CHARACTERISTIC_VALUE_PROPERTY_KEY, valueProperty);
+		
 		// TODO manage Descriptors
 		Variant<Path[]> descriptorsPatProperty = new Variant<Path[]>(new Path[0]);
 		characteristicMap.put(CHARACTERISTIC_DESCRIPTORS_PROPERTY_KEY, descriptorsPatProperty);
@@ -107,12 +112,9 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	}
 	
 	public void sendNotification() {
-//		this.value = newValue;
-		
 		try {
 			DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 			
-//			Variant<byte[]> signalValueVariant = new Variant<byte[]>(this.value);
 			Variant<byte[]> signalValueVariant = new Variant<byte[]>(listener.getValue());
 			Map<String, Variant> signalValue = new HashMap<String, Variant>();
 			signalValue.put(BleCharacteristic.CHARACTERISTIC_VALUE_PROPERTY_KEY, signalValueVariant);
@@ -132,16 +134,20 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	@Override
 	public byte[] ReadValue(Map<String, Variant> option) {
 		System.out.println("Characteristic Read option[" + option + "]");
-//		byte[] b = value.getBytes(Charset.forName("ASCII"));
-//		return value;
-		return listener.getValue();
+		int offset = 0;
+		if(option.get("offset") != null) {
+			Variant<UInt16> voffset = option.get("offset");
+			offset = (voffset.getValue() != null) ? voffset.getValue().intValue() : offset;
+		}
+		
+		byte[] valueBytes = listener.getValue();
+		byte[] slice = Arrays.copyOfRange(valueBytes, offset, valueBytes.length);
+		return slice;
 	}
 
 	@Override
 	public void WriteValue(byte[] value, Map<String, Variant> option) {
 		System.out.println("Characteristic Write option[" + option + "]");
-//		this.value = new String(value, Charset.forName("ASCII"));
-//		this.value = value;
 		listener.setValue(value);
 	}
 
@@ -164,13 +170,14 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	}
 	
 	@Override
-	public <A> A Get(String arg0, String arg1) {
+	public <A> A Get(String interface_name, String property_name) {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
-	public <A> void Set(String arg0, String arg1, A arg2) {
+	public <A> void Set(String interface_name, String property_name, A value) {
 		// TODO Auto-generated method stub
 	}
 	
