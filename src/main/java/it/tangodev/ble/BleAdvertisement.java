@@ -33,9 +33,13 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 	public List<String> solicitUUIDs;
 	public Map<String, Integer> serviceData;
 	public boolean includeTxPower = true;
+	private String path;
 	
-	private String path = "/it/tangodev/openlaptimer/advertisement";
-	
+	/**
+	 * 
+	 * @param type
+	 * @param path: absolute path of the advertisement
+	 */
 	public BleAdvertisement(String type, String path) {
 		this.type = type;
 		this.path = path;
@@ -46,10 +50,14 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 		this.servicesUUIDs.add(service.getUuid());
 	}
 	
-	public void export(DBusConnection dbusConnection) throws DBusException {
+	protected void export(DBusConnection dbusConnection) throws DBusException {
 		dbusConnection.exportObject(this.getPath().toString(), this);
 	}
 	
+	/**
+	 * Return the Path (dbus class)
+	 * @return
+	 */
 	public Path getPath() {
 		return new Path(path);
 	}

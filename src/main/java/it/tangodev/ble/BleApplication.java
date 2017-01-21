@@ -15,6 +15,12 @@ import org.freedesktop.dbus.Path;
 import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
 
+/**
+ * BleApplication class is the starting point of the entire Peripheral service's structure.
+ * It is responsible of the service's publishment and and the advertisement.
+ * @author Tongo
+ *
+ */
 public class BleApplication implements GattApplication1 {
 
 	public static final String BLUEZ_DBUS_BUSNAME = "org.bluez";
@@ -29,10 +35,27 @@ public class BleApplication implements GattApplication1 {
 	private BleAdvertisement adv;
 	private String adapterAlias;
 	
+	/**
+	 * In order to create a BleApplication you need to pass a path.
+	 * The bluezero standard structure is:
+	 * APPLICAZION
+	 * 	SERVICE
+	 * 		CHARACTERISTIC-1
+	 * 		CHARACTERISTIC-2
+	 * 
+	 * Since bluez 5.43, the advertisement is able to run only ONE service.
+	 * @param path
+	 */
 	public BleApplication(String path) {
 		this.path = path;
 	}
 	
+	/**
+	 * First of all the method power-on the adapter.
+	 * Then publish the service with their characteristic and start the advertisement (only primary service can advertise).
+	 * @throws DBusException
+	 * @throws InterruptedException
+	 */
 	public void start() throws DBusException, InterruptedException {
 		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 		
@@ -69,6 +92,11 @@ public class BleApplication implements GattApplication1 {
 		gattManager.RegisterApplication(this, appOptions);
 	}
 	
+	/**
+	 * Stop the advertisement and unpublish the service.
+	 * @throws DBusException
+	 * @throws InterruptedException
+	 */
 	public void stop() throws DBusException, InterruptedException {
 		if(adapterPath == null) { return; }
 		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
@@ -79,15 +107,13 @@ public class BleApplication implements GattApplication1 {
 		gattManager.UnregisterApplication(this);
 	}
 	
+	/**
+	 * Set the alias name of the peripheral. This name is visible by the central that discover s peripheral.
+	 * This must set before start to take effect.
+	 * @param alias
+	 */
 	public void setAdapterAlias(String alias) {
 		adapterAlias = alias;
-	}
-	
-	public void export(DBusConnection dbusConnection) throws DBusException {
-		for (BleService service : servicesList) {
-			service.export(dbusConnection);
-		}
-		dbusConnection.exportObject(path, this);
 	}
 	
 	public void addService(BleService service) {
@@ -129,6 +155,18 @@ public class BleApplication implements GattApplication1 {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Export the application in Dbus system.
+	 * @param dbusConnection
+	 * @throws DBusException
+	 */
+	private void export(DBusConnection dbusConnection) throws DBusException {
+		for (BleService service : servicesList) {
+			service.export(dbusConnection);
+		}
+		dbusConnection.exportObject(path, this);
 	}
 	
 	@Override

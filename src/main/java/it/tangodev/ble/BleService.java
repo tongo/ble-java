@@ -12,6 +12,11 @@ import org.freedesktop.dbus.Path;
 import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
 
+/**
+ * BleService class rapresent the service.
+ * @author Tongo
+ *
+ */
 public class BleService implements GattService1, Properties {
 	
 	private static final String GATT_SERVICE_INTERFACE = "org.bluez.GattService1";
@@ -24,8 +29,12 @@ public class BleService implements GattService1, Properties {
 	private List<BleCharacteristic> characteristics = new ArrayList<BleCharacteristic>();
 	private String path = null;
 	
-	public BleService() { }
-	
+	/**
+	 * Remember that the path need to have this format APPLICATION/SERVICE
+	 * @param path: Absolute path
+	 * @param uuId: unique ID 128 bit in this format 13333333-3333-3333-3333-333333333001
+	 * @param primary
+	 */
 	public BleService(String path, String uuId, Boolean primary) {
 		this.path = path;
 		this.uuid = uuId;
@@ -44,18 +53,26 @@ public class BleService implements GattService1, Properties {
 		return characteristics;
 	}
 	
-	public void export(DBusConnection dbusConnection) throws DBusException {
+	protected void export(DBusConnection dbusConnection) throws DBusException {
 		for (BleCharacteristic characteristic : characteristics) {
 			characteristic.export(dbusConnection);
 		}
 		dbusConnection.exportObject(this.getPath().toString(), this);
 	}
 	
+	/**
+	 * Return the Path (dbus class)
+	 * @return
+	 */
 	public Path getPath() {
 		return new Path(path);
 	}
 	
-	public Path[] getCharacteristicsPathArray() {
+	/**
+	 * Convert the list in array[]
+	 * @return
+	 */
+	private Path[] getCharacteristicsPathArray() {
 		Path[] pathArray = new Path[characteristics.size()];
 		for (int i=0; i < characteristics.size(); i++) {
 			pathArray[i] = characteristics.get(i).getPath();
@@ -80,7 +97,7 @@ public class BleService implements GattService1, Properties {
 		externalMap.put(GATT_SERVICE_INTERFACE, serviceMap);
 		
 		return externalMap;
-}
+	}
 	
 	public Boolean isPrimary() {
 		return primary != null && primary;

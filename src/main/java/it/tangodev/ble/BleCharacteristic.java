@@ -17,6 +17,11 @@ import org.freedesktop.dbus.UInt16;
 import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
 
+/**
+ * BleCharacteristic represent a single peripheral's value that can be read, write or notified.
+ * @author Tongo
+ *
+ */
 //@SuppressWarnings("rawtypes")
 public class BleCharacteristic implements GattCharacteristic1, Properties {
 
@@ -32,9 +37,13 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	private List<String> flags = new ArrayList<String>();;
 	protected String path = null;
 	private boolean isNotifying = false;
-//	private byte[] value = new byte[0];
 	protected CharacteristicListener listener;
 	
+	/**
+	 * A flag indicate the operation allowed on a single characteristic.
+	 * @author Tongo
+	 *
+	 */
 	public enum CharacteristicFlag {
 		READ("read"),
 		WRITE("write"),
@@ -58,10 +67,23 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 			return this.flag;
 		}
 	}
+	
+	/**
+	 * 
+	 * @param service: The service that contains the Characteristic
+	 */
 	public BleCharacteristic(BleService service) {
 		this.service = service;
 	}
 	
+	/**
+	 * 
+	 * @param path: The absolute path, APPLICATION/SERVICE/CHARACTERISTIC
+	 * @param service
+	 * @param flags
+	 * @param uuId
+	 * @param listener: who can provide the data
+	 */
 	public BleCharacteristic(String path, BleService service, List<CharacteristicFlag> flags, String uuId, CharacteristicListener listener) {
 		this.path = path;
 		this.service = service;
@@ -76,10 +98,14 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		}
 	}
 	
-	public void export(DBusConnection dbusConnection) throws DBusException {
+	protected void export(DBusConnection dbusConnection) throws DBusException {
 		dbusConnection.exportObject(this.getPath().toString(), this);
 	}
 	
+	/**
+	 * Return the Path (dbus class)
+	 * @return
+	 */
 	public Path getPath() {
 		return new Path(path);
 	}
@@ -98,9 +124,6 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		Variant<String[]> flagsProperty = new Variant<String[]>(Utils.getStringArrayFromList(this.flags));
 		characteristicMap.put(CHARACTERISTIC_FLAGS_PROPERTY_KEY, flagsProperty);
 		
-//		Variant<byte[]> valueProperty = new Variant<byte[]>(this.value);
-//		characteristicMap.put(CHARACTERISTIC_VALUE_PROPERTY_KEY, valueProperty);
-		
 		// TODO manage Descriptors
 		Variant<Path[]> descriptorsPatProperty = new Variant<Path[]>(new Path[0]);
 		characteristicMap.put(CHARACTERISTIC_DESCRIPTORS_PROPERTY_KEY, descriptorsPatProperty);
@@ -111,6 +134,9 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		return externalMap;
 	}
 	
+	/**
+	 * Call this method to send a notification to a central.
+	 */
 	public void sendNotification() {
 		try {
 			DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
@@ -131,6 +157,9 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		return false;
 	}
 
+	/**
+	 * This method is called when the central request the Characteristic's value.
+	 */
 	@Override
 	public byte[] ReadValue(Map<String, Variant> option) {
 		System.out.println("Characteristic Read option[" + option + "]");
@@ -145,6 +174,9 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		return slice;
 	}
 
+	/**
+	 * This method is called when the central want to write the Characteristic's value.
+	 */
 	@Override
 	public void WriteValue(byte[] value, Map<String, Variant> option) {
 		System.out.println("Characteristic Write option[" + option + "]");
