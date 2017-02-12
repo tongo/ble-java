@@ -2,7 +2,7 @@ package example;
 
 import it.tangodev.ble.BleCharacteristic;
 import it.tangodev.ble.BleService;
-import it.tangodev.ble.CharacteristicListener;
+import it.tangodev.ble.BleCharacteristicListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class ExampleCharacteristic extends BleCharacteristic implements GattChar
 		this.path = "/tango/s/ec";
 		this.uuid = "13333333-3333-3333-3333-333333333003";
 		
-		this.listener = new CharacteristicListener() {
+		this.listener = new BleCharacteristicListener() {
 			@Override
 			public void setValue(byte[] value) {
 				try {

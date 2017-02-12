@@ -9,8 +9,12 @@ import org.bluez.GattApplication1;
 import org.bluez.GattManager1;
 import org.bluez.LEAdvertisingManager1;
 import org.dbus.ObjectManager;
+import org.dbus.InterfacesAddedSignal.InterfacesAdded;
+import org.dbus.InterfacesRomovedSignal.InterfacesRemoved;
+import org.freedesktop.DBus;
 import org.freedesktop.DBus.Properties;
 import org.freedesktop.dbus.DBusConnection;
+import org.freedesktop.dbus.DBusSigHandler;
 import org.freedesktop.dbus.Path;
 import org.freedesktop.dbus.Variant;
 import org.freedesktop.dbus.exceptions.DBusException;
@@ -23,7 +27,9 @@ import org.freedesktop.dbus.exceptions.DBusException;
  */
 public class BleApplication implements GattApplication1 {
 
+	public static final String DBUS_BUSNAME = "org.freedesktop.DBus";
 	public static final String BLUEZ_DBUS_BUSNAME = "org.bluez";
+	public static final String BLUEZ_DEVICE_INTERFACE = "org.bluez.Device1";
 	public static final String BLUEZ_ADAPTER_INTERFACE = "org.bluez.Adapter1";
 	public static final String BLUEZ_GATT_INTERFACE = "org.bluez.GattManager1";
 	public static final String BLUEZ_LE_ADV_INTERFACE = "org.bluez.LEAdvertisingManager1";
@@ -34,6 +40,12 @@ public class BleApplication implements GattApplication1 {
 	private BleService advService;
 	private BleAdvertisement adv;
 	private String adapterAlias;
+	
+	private boolean hasDeviceConnected = false;
+	
+	private DBusSigHandler<InterfacesAdded> interfacesAddedSignalHandler;
+	private DBusSigHandler<InterfacesRemoved> interfacesRemovedSignalHandler;
+	private BleApplicationListener listener;
 	
 	/**
 	 * In order to create a BleApplication you need to pass a path.
@@ -46,8 +58,9 @@ public class BleApplication implements GattApplication1 {
 	 * Since bluez 5.43, the advertisement is able to run only ONE service.
 	 * @param path
 	 */
-	public BleApplication(String path) {
+	public BleApplication(String path, BleApplicationListener listener) {
 		this.path = path;
+		this.listener = listener;
 	}
 	
 	/**
@@ -90,6 +103,8 @@ public class BleApplication implements GattApplication1 {
 		
 		Map<String, Variant> appOptions = new HashMap<String, Variant>();
 		gattManager.RegisterApplication(this, appOptions);
+		
+		initInterfacesHandler();
 	}
 	
 	/**
@@ -105,6 +120,48 @@ public class BleApplication implements GattApplication1 {
 		
 		if(adv != null) { advManager.UnregisterAdvertisement(adv); }
 		gattManager.UnregisterApplication(this);
+		
+		dbusConnection.removeSigHandler(InterfacesAdded.class, interfacesAddedSignalHandler);
+		dbusConnection.removeSigHandler(InterfacesRemoved.class, interfacesRemovedSignalHandler);
+		dbusConnection.disconnect();
+	}
+	
+	protected void initInterfacesHandler() throws DBusException {
+		DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
+		DBus dbus = dbusConnection.getRemoteObject(DBUS_BUSNAME, "/or/freedesktop/DBus", DBus.class);
+		String bluezDbusBusName = dbus.GetNameOwner(BLUEZ_DBUS_BUSNAME);
+		ObjectManager bluezObjectManager = (ObjectManager) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/", ObjectManager.class);
+		
+		interfacesAddedSignalHandler = new DBusSigHandler<InterfacesAdded>() {
+			@Override
+			public void handle(InterfacesAdded signal) {
+				Map<String, Variant> iamap = signal.getInterfacesAdded().get(BLUEZ_DEVICE_INTERFACE);
+				if(iamap != null) {
+					Variant<String> address = iamap.get("Address");
+					System.out.println("Device address: " + address.getValue());
+					System.out.println("Device added path: " + signal.getObjectPath().toString());
+					hasDeviceConnected = true;
+					if(listener != null) { listener.deviceConnected(); }
+				}
+			}
+		};
+
+		interfacesRemovedSignalHandler = new DBusSigHandler<InterfacesRemoved>() {
+			@Override
+			public void handle(InterfacesRemoved signal) {
+				List<String> irlist = signal.getInterfacesRemoved();
+				for (String ir : irlist) {
+					if(BLUEZ_DEVICE_INTERFACE.equals(ir)) {
+						System.out.println("Device Removed path: " + signal.getObjectPath().toString());
+						hasDeviceConnected = false;
+						if(listener != null) { listener.deviceDisconnected(); }
+					}
+				}
+			}
+		};
+
+		dbusConnection.addSigHandler(InterfacesAdded.class, bluezDbusBusName, bluezObjectManager, interfacesAddedSignalHandler);
+		dbusConnection.addSigHandler(InterfacesRemoved.class, bluezDbusBusName, bluezObjectManager, interfacesRemovedSignalHandler);
 	}
 	
 	/**
@@ -126,6 +183,10 @@ public class BleApplication implements GattApplication1 {
 	
 	public List<BleService> getServicesList() {
 		return servicesList;
+	}
+
+	public boolean hasDeviceConnected() {
+		return hasDeviceConnected;
 	}
 
 	/**

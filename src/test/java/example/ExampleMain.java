@@ -1,13 +1,14 @@
 package example;
 
+import it.tangodev.ble.BleApplication;
+import it.tangodev.ble.BleApplicationListener;
+import it.tangodev.ble.BleCharacteristic;
+import it.tangodev.ble.BleCharacteristic.CharacteristicFlag;
+import it.tangodev.ble.BleCharacteristicListener;
+import it.tangodev.ble.BleService;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import it.tangodev.ble.BleApplication;
-import it.tangodev.ble.BleCharacteristic;
-import it.tangodev.ble.CharacteristicListener;
-import it.tangodev.ble.BleCharacteristic.CharacteristicFlag;
-import it.tangodev.ble.BleService;
 
 import org.freedesktop.dbus.exceptions.DBusException;
 
@@ -24,14 +25,25 @@ public class ExampleMain implements Runnable {
 	}
 	
 	public ExampleMain() throws DBusException, InterruptedException {
-		app = new BleApplication("/tango");
+		BleApplicationListener appListener = new BleApplicationListener() {
+			@Override
+			public void deviceDisconnected() {
+				System.out.println("Device disconnected");
+			}
+			
+			@Override
+			public void deviceConnected() {
+				System.out.println("Device connected");
+			}
+		};
+		app = new BleApplication("/tango", appListener);
 		service = new BleService("/tango/s", "13333333-3333-3333-3333-333333333001", true);
 		List<CharacteristicFlag> flags = new ArrayList<CharacteristicFlag>();
 		flags.add(CharacteristicFlag.READ);
 		flags.add(CharacteristicFlag.WRITE);
 		flags.add(CharacteristicFlag.NOTIFY);
 		
-		characteristic = new BleCharacteristic("/tango/s/c", service, flags, "13333333-3333-3333-3333-333333333002", new CharacteristicListener() {
+		characteristic = new BleCharacteristic("/tango/s/c", service, flags, "13333333-3333-3333-3333-333333333002", new BleCharacteristicListener() {
 			@Override
 			public void setValue(byte[] value) {
 				try {

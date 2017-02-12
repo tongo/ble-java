@@ -37,7 +37,7 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	private List<String> flags = new ArrayList<String>();;
 	protected String path = null;
 	private boolean isNotifying = false;
-	protected CharacteristicListener listener;
+	protected BleCharacteristicListener listener;
 	
 	/**
 	 * A flag indicate the operation allowed on a single characteristic.
@@ -84,7 +84,7 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	 * @param uuId
 	 * @param listener: who can provide the data
 	 */
-	public BleCharacteristic(String path, BleService service, List<CharacteristicFlag> flags, String uuId, CharacteristicListener listener) {
+	public BleCharacteristic(String path, BleService service, List<CharacteristicFlag> flags, String uuId, BleCharacteristicListener listener) {
 		this.path = path;
 		this.service = service;
 		this.uuid = uuId;

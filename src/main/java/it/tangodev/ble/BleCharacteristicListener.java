@@ -5,7 +5,7 @@ package it.tangodev.ble;
  * @author Tongo
  *
  */
-public interface CharacteristicListener {
+public interface BleCharacteristicListener {
 	public byte[] getValue();
 	public void setValue(byte[] value);
 }
