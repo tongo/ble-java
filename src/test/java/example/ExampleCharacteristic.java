@@ -26,7 +26,7 @@ public class ExampleCharacteristic extends BleCharacteristic implements GattChar
 		
 		this.listener = new BleCharacteristicListener() {
 			@Override
-			public void setValue(byte[] value) {
+			public void setValue(String devicePath, int offset, byte[] value) {
 				try {
 					exampleValue = new String(value, "UTF8");
 				} catch(Exception e) {
@@ -35,7 +35,7 @@ public class ExampleCharacteristic extends BleCharacteristic implements GattChar
 			}
 			
 			@Override
-			public byte[] getValue() {
+			public byte[] getValue(String devicePath) {
 				try {
 					return exampleValue.getBytes("UTF8");
 				} catch(Exception e) {

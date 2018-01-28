@@ -5,3 +5,7 @@
 .settings
 .project
 .classpath
+
+# ignore JetBrains IntilliJ project files
+.idea/
+ble-java.iml

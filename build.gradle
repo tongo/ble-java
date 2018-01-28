@@ -6,34 +6,24 @@
  * user guide available at https://docs.gradle.org/4.5/userguide/java_library_plugin.html
  */
 
-buildscript {
-    version = '0.1'
-}
+// Apply the java plugin to add support for Java
+apply plugin: 'java'
+apply plugin: 'maven'
 
-plugins {
-    // Apply the java-library plugin to add support for Java Library
-    id 'java-library'
-}
+project.version = '0.2'
+project.group = 'it.tangodev'
 
-dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    //api 'org.apache.commons:commons-math3:3.6.1'
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation name: 'unix'
-    implementation name: 'libmatthew-java-0.8'
-    implementation name: 'dbus-java-2.7'
-
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
-}
-
-// In this section you declare where to find the dependencies of your project
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
-    flatDir { dirs 'libs' }
+    mavenLocal()
+    mavenCentral()
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    // The production code uses the SLF4J logging API at compile time
+    compile 'org.slf4j:slf4j-api:1.7.21'
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 jar {
@@ -41,4 +31,9 @@ jar {
         attributes('Implementation-Title': project.name,
                    'Implementation-Version': project.version)
     }
+}
+
+task (runExample, dependsOn: 'classes', type: JavaExec) {
+    main = 'example.ExampleMain'
+    classpath = sourceSets.test.runtimeClasspath
 }
