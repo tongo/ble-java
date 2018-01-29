@@ -35,5 +35,6 @@ jar {
 
 task (runExample, dependsOn: 'classes', type: JavaExec) {
     main = 'example.ExampleMain'
-    classpath = sourceSets.test.runtimeClasspath
+    systemProperty "java.library.path", "/usr/lib/jni"
+    classpath = sourceSets.test.runtimeClasspath 
 }
