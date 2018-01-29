@@ -15,7 +15,8 @@
 # Dependencies
 1. Java 8 or better
 2. BlueZ 5.43 or better
-3. d-bus Java library `libdbus-java`
+3. libunixsocket-java (```apt-get install libsocket-java```) 
+4. d-bus Java library `libdbus-java`
 
 Raspbian install:
 ```
@@ -38,7 +39,7 @@ creates a BLE Application with one Service and 2 Characteristics.
 
 Before running the example, copy ```example.conf``` to ```/etc/dbus-1/system.d/```
 
-To run from command line: ````./gradlew runExample````
+To run from command line: ````sudo ./gradlew runExample````
 
 Press ctrl-c to stop service.
 
