@@ -170,7 +170,7 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		}
 
 		String devicePath = null;
-		devicePath = stringVarientToString(option, devicePath);
+		devicePath = stringVariantToString(option, devicePath);
 
 		byte[] valueBytes = getValue(devicePath);
 		byte[] slice = Arrays.copyOfRange(valueBytes, offset, valueBytes.length);
@@ -190,10 +190,10 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 		}
 
 		String devicePath = null;
-		setValue(stringVarientToString(option, devicePath), offset, value);
+		setValue(stringVariantToString(option, devicePath), offset, value);
 	}
 
-	protected String stringVarientToString(Map<String, Variant> option, String devicePath) {
+	protected String stringVariantToString(Map<String, Variant> option, String devicePath) {
 		if (option.containsKey("device")) {
 			Variant<Path> pathVariant = null;
 			pathVariant = option.get("pathVariant");
