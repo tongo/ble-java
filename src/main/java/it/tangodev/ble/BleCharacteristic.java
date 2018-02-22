@@ -101,6 +101,10 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	protected void export(DBusConnection dbusConnection) throws DBusException {
 		dbusConnection.exportObject(this.getPath().toString(), this);
 	}
+
+	protected void unexport(DBusConnection dBusConnection) throws DBusException {
+		dBusConnection.unExportObject(this.getPath().toString());
+	}
 	
 	/**
 	 * Return the Path (dbus class)
