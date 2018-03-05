@@ -28,7 +28,7 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 	private static final String ADVERTISEMENT_INCLUDE_TX_POWER_PROPERTY_KEY = "IncludeTxPower";
 
 	private String type;
-	List<String> servicesUUIDs;
+	private List<String> servicesUUIDs;
 	private Map<Integer, Integer> manufacturerData;
 	private List<String> solicitUUIDs;
 	private Map<String, Integer> serviceData;
@@ -46,7 +46,7 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 		this.servicesUUIDs = new ArrayList<>();
 		this.solicitUUIDs = new ArrayList<>();
 	}
-	
+
 	public void addService(BleService service) {
 		this.servicesUUIDs.add(service.getUuid());
 	}
@@ -63,13 +63,16 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 		this.manufacturerData = manufacturerData;
 	}
 
-
 	public void setServiceData(Map<String, Integer> serviceData) {
 		this.serviceData = serviceData;
 	}
 
 	public void setIncludeTxPower(boolean includeTxPower) {
 		this.includeTxPower = includeTxPower;
+	}
+
+	public boolean hasServices() {
+		return servicesUUIDs != null && !servicesUUIDs.isEmpty();
 	}
 
 	protected void export(DBusConnection dbusConnection) throws DBusException {
@@ -92,11 +95,11 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 		Variant<String> Type = new Variant<String>(this.type);
 		advertisementMap.put(ADVERTISEMENT_TYPE_PROPERTY_KEY, Type);
 
-		if(!servicesUUIDs.isEmpty()) {
+		if(servicesUUIDs != null && !servicesUUIDs.isEmpty()) {
 			Variant<String[]> serviceUUIDs = new Variant<String[]>(Utils.getStringArrayFromList(this.servicesUUIDs));
 			advertisementMap.put(ADVERTISEMENT_SERVICES_UUIDS_PROPERTY_KEY, serviceUUIDs);
 		}
-		if(!solicitUUIDs.isEmpty()) {
+		if(solicitUUIDs != null && !solicitUUIDs.isEmpty()) {
 			Variant<String[]> solicitUUIDs = new Variant<String[]>(Utils.getStringArrayFromList(this.solicitUUIDs));
 			advertisementMap.put(ADVERTISEMENT_SOLICIT_UUIDS_PROPERTY_KEY, solicitUUIDs);
 		}
@@ -143,7 +146,7 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 		if(LEADVERTISEMENT_INTERFACE.equals(interfaceName)) {
 			return this.getProperties().get(LEADVERTISEMENT_INTERFACE);
 		}
-		throw new RuntimeException("Interfaccia sbagliata [interface_name=" + interfaceName + "]");
+		throw new RuntimeException("Wrong interface [interface_name=" + interfaceName + "]");
 	}
 
 }
