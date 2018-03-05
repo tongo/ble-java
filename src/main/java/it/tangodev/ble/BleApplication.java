@@ -61,6 +61,9 @@ public class BleApplication implements GattApplication1 {
 	public BleApplication(String path, BleApplicationListener listener) {
 		this.path = path;
 		this.listener = listener;
+
+		String advPath = path + "/advertisement";
+		this.adv = new BleAdvertisement(BleAdvertisement.ADVERTISEMENT_TYPE_PERIPHERAL, advPath);
 	}
 	
 	/**
@@ -85,17 +88,11 @@ public class BleApplication implements GattApplication1 {
 		
 		LEAdvertisingManager1 advManager = (LEAdvertisingManager1) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, adapterPath, LEAdvertisingManager1.class);
 
-		String advPath = path + "/advertisement";
-		adv = new BleAdvertisement(BleAdvertisement.ADVERTISEMENT_TYPE_PERIPHERAL, advPath);
-		for (BleService service : servicesList) {
-			if(service.isPrimary()) {
-				adv.addService(service);
-				break;
-			}
+		if (!adv.hasServices()) {
+			updateAdvertisement();
 		}
-
-		export();
-
+    export();
+		
 		Map<String, Variant> advOptions = new HashMap<String, Variant>();
 		advManager.RegisterAdvertisement(adv, advOptions);
 		
@@ -189,6 +186,10 @@ public class BleApplication implements GattApplication1 {
 		return hasDeviceConnected;
 	}
 
+	public BleAdvertisement getAdvertisement() {
+		return adv;
+	}
+
 	/**
 	 * Search for a Adapter that has GattManager1 and LEAdvertisement1 interfaces, otherwise return null.
 	 * @return
@@ -265,4 +266,13 @@ public class BleApplication implements GattApplication1 {
 		return response;
 	}
 
+	// add primary service uuids to advertisement
+	private void updateAdvertisement() {
+		for (BleService service : servicesList) {
+			if(service.isPrimary()) {
+				adv.addService(service);
+				break;
+			}
+		}
+	}
 }

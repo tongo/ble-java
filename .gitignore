@@ -9,3 +9,9 @@
 .settings
 .project
 .classpath
+
+# ignore the intelliJ project file
+/out
+/classes
+*.iml
+/.idea
