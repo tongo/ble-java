@@ -37,7 +37,6 @@ public class BleApplication implements GattApplication1 {
 	private List<BleService> servicesList = new ArrayList<BleService>();
 	private String path = null;
 	private String adapterPath;
-	private BleService advService;
 	private BleAdvertisement adv;
 	private String adapterAlias;
 	
@@ -255,7 +254,6 @@ public class BleApplication implements GattApplication1 {
 	private void updateAdvertisement() {
 		for (BleService service : servicesList) {
 			if(service.isPrimary()) {
-				advService = service;
 				adv.addService(service);
 				break;
 			}
