@@ -91,7 +91,7 @@ public class BleApplication implements GattApplication1 {
 		if (!adv.hasServices()) {
 			updateAdvertisement();
 		}
-    export();
+		export();
 		
 		Map<String, Variant> advOptions = new HashMap<String, Variant>();
 		advManager.RegisterAdvertisement(adv, advOptions);
