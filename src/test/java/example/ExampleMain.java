@@ -89,13 +89,14 @@ public class ExampleMain implements Runnable {
 //		Thread t = new Thread(example);
 //		t.start();
 //		Thread.sleep(15000);
-//		example.notifyBle("woooooo");
+		example.notifyBle("woooooo");
 //		Thread.sleep(15000);
 //		t.notify();
 
 //		Thread.sleep(5000);
 //		System.out.println("stopping application");
-//		example.getApp().stop();
+		example.getApp().stop();
+		System.out.println("Application stopped");
 	}
 	
 }

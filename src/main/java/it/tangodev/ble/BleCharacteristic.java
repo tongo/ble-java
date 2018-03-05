@@ -151,6 +151,7 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 			
 			PropertiesChanged signal = new PropertiesChanged(this.getPath().toString(), GATT_CHARACTERISTIC_INTERFACE, signalValue, new ArrayList<String>());
 			dbusConnection.sendSignal(signal);
+			dbusConnection.disconnect();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
