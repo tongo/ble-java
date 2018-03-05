@@ -250,7 +250,7 @@ public class BleApplication implements GattApplication1 {
 		return response;
 	}
 
-	// add service uuids to advertisement
+	// add primary service uuids to advertisement
 	private void updateAdvertisement() {
 		for (BleService service : servicesList) {
 			if(service.isPrimary()) {
