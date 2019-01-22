@@ -16,13 +16,8 @@ plugins {
 }
 
 dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    //api 'org.apache.commons:commons-math3:3.6.1'
-
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation name: 'unix'
-    implementation name: 'libmatthew-java-0.8'
-    implementation name: 'dbus-java-2.7'
+    compile group: 'com.github.bdeneuter', name: 'cx.ath.matthew', version: '0.8'
+    compile group: 'com.github.hypfvieh', name: 'dbus-java', version: '2.7.5'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
@@ -30,10 +25,7 @@ dependencies {
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
-    flatDir { dirs 'libs' }
+    mavenCentral()
 }
 
 jar {
