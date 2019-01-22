@@ -87,20 +87,20 @@ public class BleService implements GattService1, Properties {
 		return pathArray;
 	}
 	
-	public Map<String, Map<String, Variant>> getProperties() {
+	public Map<String, Map<String, Variant<?>>> getProperties() {
 		System.out.println("Service -> getServiceProperties");
-		Map<String, Variant> serviceMap = new HashMap<String, Variant>();
+		Map<String, Variant<?>> serviceMap = new HashMap<>();
 		
-		Variant<String> uuidProperty = new Variant<String>(this.uuid);
+		Variant<String> uuidProperty = new Variant<>(this.uuid);
 		serviceMap.put(SERVICE_UUID_PROPERTY_KEY, uuidProperty);
 		
-		Variant<Boolean> primaryProperty = new Variant<Boolean>(this.primary);
+		Variant<Boolean> primaryProperty = new Variant<>(this.primary);
 		serviceMap.put(SERVICE_PRIMARY_PROPERTY_KEY, primaryProperty);
 		
-		Variant<Path[]> characteristicsPat = new Variant<Path[]>(getCharacteristicsPathArray());
+		Variant<Path[]> characteristicsPat = new Variant<>(getCharacteristicsPathArray());
 		serviceMap.put(SERVICE_CHARACTERISTIC_PROPERTY_KEY, characteristicsPat);
 		
-		Map<String, Map<String, Variant>> externalMap = new HashMap<String, Map<String, Variant>>();
+		Map<String, Map<String, Variant<?>>> externalMap = new HashMap<>();
 		externalMap.put(GATT_SERVICE_INTERFACE, serviceMap);
 		
 		return externalMap;
@@ -134,6 +134,11 @@ public class BleService implements GattService1, Properties {
 	public boolean isRemote() { return false; }
 
 	@Override
+	public String getObjectPath() {
+		return path;
+	}
+
+	@Override
 	public <A> A Get(String interface_name, String property_name) {
 		// TODO Auto-generated method stub
 		return null;
@@ -145,7 +150,7 @@ public class BleService implements GattService1, Properties {
 	}
 
 	@Override
-	public Map<String, Variant> GetAll(String interfaceName) {
+	public Map<String, Variant<?>> GetAll(String interfaceName) {
 		if(GATT_SERVICE_INTERFACE.equals(interfaceName)) {
 			return this.getProperties().get(GATT_SERVICE_INTERFACE);
 		}

@@ -91,35 +91,35 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 		return new Path(path);
 	}
 	
-	public Map<String, Map<String, Variant>> getProperties() {
+	public Map<String, Map<String, Variant<?>>> getProperties() {
 		System.out.println("Advertisement -> getAdvertisementProperties");
 		
-		Map<String, Variant> advertisementMap = new HashMap<String, Variant>();
+		Map<String, Variant<?>> advertisementMap = new HashMap<>();
 		
-		Variant<String> Type = new Variant<String>(this.type);
+		Variant<String> Type = new Variant<>(this.type);
 		advertisementMap.put(ADVERTISEMENT_TYPE_PROPERTY_KEY, Type);
 
 		if(servicesUUIDs != null && !servicesUUIDs.isEmpty()) {
-			Variant<String[]> serviceUUIDs = new Variant<String[]>(Utils.getStringArrayFromList(this.servicesUUIDs));
+			Variant<String[]> serviceUUIDs = new Variant<>(Utils.getStringArrayFromList(this.servicesUUIDs));
 			advertisementMap.put(ADVERTISEMENT_SERVICES_UUIDS_PROPERTY_KEY, serviceUUIDs);
 		}
 		if(solicitUUIDs != null && !solicitUUIDs.isEmpty()) {
-			Variant<String[]> solicitUUIDs = new Variant<String[]>(Utils.getStringArrayFromList(this.solicitUUIDs));
+			Variant<String[]> solicitUUIDs = new Variant<>(Utils.getStringArrayFromList(this.solicitUUIDs));
 			advertisementMap.put(ADVERTISEMENT_SOLICIT_UUIDS_PROPERTY_KEY, solicitUUIDs);
 		}
 		if(manufacturerData != null) {
-			Variant<Map<Integer, Integer>> manufacturerData = new Variant<Map<Integer, Integer>>(this.manufacturerData);
+			Variant<Map<Integer, Integer>> manufacturerData = new Variant<>(this.manufacturerData);
 			advertisementMap.put(ADVERTISEMENT_MANUFACTURER_DATA_PROPERTY_KEY, manufacturerData);
 		}
 		if(serviceData != null) {
-			Variant<Map<String, Integer>> serviceData = new Variant<Map<String, Integer>>(this.serviceData);
+			Variant<Map<String, Integer>> serviceData = new Variant<>(this.serviceData);
 			advertisementMap.put(ADVERTISEMENT_SERVICE_DATA_PROPERTY_KEY, serviceData);
 		}
 		
-		Variant<Boolean> includeTxPower = new Variant<Boolean>(this.includeTxPower);
+		Variant<Boolean> includeTxPower = new Variant<>(this.includeTxPower);
 		advertisementMap.put(ADVERTISEMENT_INCLUDE_TX_POWER_PROPERTY_KEY, includeTxPower);
 		
-		Map<String, Map<String, Variant>> externalMap = new HashMap<String, Map<String, Variant>>();
+		Map<String, Map<String, Variant<?>>> externalMap = new HashMap<>();
 		externalMap.put(LEADVERTISEMENT_INTERFACE, advertisementMap);
 		
 		return externalMap;
@@ -127,6 +127,11 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 	
 	@Override
 	public boolean isRemote() { return false; }
+
+	@Override
+	public String getObjectPath() {
+		return path;
+	}
 
 	@Override
 	public void Release() {
@@ -146,7 +151,7 @@ public class BleAdvertisement implements LEAdvertisement1, Properties {
 	}
 	
 	@Override
-	public Map<String, Variant> GetAll(String interfaceName) {
+	public Map<String, Variant<?>> GetAll(String interfaceName) {
 		if(LEADVERTISEMENT_INTERFACE.equals(interfaceName)) {
 			return this.getProperties().get(LEADVERTISEMENT_INTERFACE);
 		}

@@ -248,12 +248,15 @@ public class BleApplication implements GattApplication1 {
 	
 	@Override
 	public boolean isRemote() { return false; }
-	
+
 	@Override
-	public Map<Path, Map<String, Map<String, Variant>>> GetManagedObjects() {
-		System.out.println("Application -> GetManagedObjects");
-		
-		Map<Path, Map<String, Map<String, Variant>>> response = new HashMap<Path, Map<String,Map<String,Variant>>>();
+	public String getObjectPath() {
+		return path;
+	}
+
+	@Override
+	public Map<Path, Map<String, Map<String, Variant<?>>>> GetManagedObjects() {
+		Map<Path, Map<String, Map<String, Variant<?>>>> response = new HashMap<>();
 		for (BleService service : servicesList) {
 			response.put(service.getPath(), service.getProperties());
 			for (BleCharacteristic characteristic : service.getCharacteristics()) {
