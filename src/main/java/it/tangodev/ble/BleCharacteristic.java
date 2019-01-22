@@ -1,15 +1,7 @@
 package it.tangodev.ble;
 
 import it.tangodev.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.bluez.GattCharacteristic1;
-import org.dbus.PropertiesChangedSignal.PropertiesChanged;
 import org.freedesktop.DBus.Properties;
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.Path;

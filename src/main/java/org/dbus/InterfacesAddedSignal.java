@@ -14,7 +14,7 @@ import org.freedesktop.dbus.exceptions.DBusException;
 public interface InterfacesAddedSignal extends DBusInterface {
 	
 	@DBusMemberName("InterfacesAdded")
-	public static class InterfacesAdded extends DBusSignal {
+	class InterfacesAdded extends DBusSignal {
 		private final Path objectPath;
 		private final Map<String, Map<String, Variant>> interfacesAdded;
 

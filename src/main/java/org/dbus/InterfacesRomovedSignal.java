@@ -13,7 +13,7 @@ import org.freedesktop.dbus.exceptions.DBusException;
 public interface InterfacesRomovedSignal extends DBusInterface {
 	
 	@DBusMemberName("InterfacesRemoved")
-	public static class InterfacesRemoved extends DBusSignal {
+	class InterfacesRemoved extends DBusSignal {
 		
 		private final Path objectPath;
 		private List<String> interfacesRemoved;

@@ -127,32 +127,26 @@ public class BleApplication implements GattApplication1 {
 	protected void initInterfacesHandler() throws DBusException {
 		DBus dbus = dbusConnection.getRemoteObject(DBUS_BUSNAME, "/or/freedesktop/DBus", DBus.class);
 		String bluezDbusBusName = dbus.GetNameOwner(BLUEZ_DBUS_BUSNAME);
-		ObjectManager bluezObjectManager = (ObjectManager) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/", ObjectManager.class);
+		ObjectManager bluezObjectManager = dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/", ObjectManager.class);
 		
-		interfacesAddedSignalHandler = new DBusSigHandler<InterfacesAdded>() {
-			@Override
-			public void handle(InterfacesAdded signal) {
-				Map<String, Variant> iamap = signal.getInterfacesAdded().get(BLUEZ_DEVICE_INTERFACE);
-				if(iamap != null) {
-					Variant<String> address = iamap.get("Address");
-					System.out.println("Device address: " + address.getValue());
-					System.out.println("Device added path: " + signal.getObjectPath().toString());
-					hasDeviceConnected = true;
-					if(listener != null) { listener.deviceConnected(); }
-				}
+		interfacesAddedSignalHandler = signal -> {
+			Map<String, Variant> iamap = signal.getInterfacesAdded().get(BLUEZ_DEVICE_INTERFACE);
+			if(iamap != null) {
+				Variant<String> address = iamap.get("Address");
+				System.out.println("Device address: " + address.getValue());
+				System.out.println("Device added path: " + signal.getObjectPath().toString());
+				hasDeviceConnected = true;
+				if(listener != null) { listener.deviceConnected(); }
 			}
 		};
 
-		interfacesRemovedSignalHandler = new DBusSigHandler<InterfacesRemoved>() {
-			@Override
-			public void handle(InterfacesRemoved signal) {
-				List<String> irlist = signal.getInterfacesRemoved();
-				for (String ir : irlist) {
-					if(BLUEZ_DEVICE_INTERFACE.equals(ir)) {
-						System.out.println("Device Removed path: " + signal.getObjectPath().toString());
-						hasDeviceConnected = false;
-						if(listener != null) { listener.deviceDisconnected(); }
-					}
+		interfacesRemovedSignalHandler = signal -> {
+			List<String> irlist = signal.getInterfacesRemoved();
+			for (String ir : irlist) {
+				if(BLUEZ_DEVICE_INTERFACE.equals(ir)) {
+					System.out.println("Device Removed path: " + signal.getObjectPath().toString());
+					hasDeviceConnected = false;
+					if(listener != null) { listener.deviceDisconnected(); }
 				}
 			}
 		};
@@ -196,7 +190,7 @@ public class BleApplication implements GattApplication1 {
 	 * @throws DBusException
 	 */
 	private String findAdapterPath() throws DBusException {
-		ObjectManager bluezObjectManager = (ObjectManager) dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/", ObjectManager.class);
+		ObjectManager bluezObjectManager = dbusConnection.getRemoteObject(BLUEZ_DBUS_BUSNAME, "/", ObjectManager.class);
 		if(bluezObjectManager == null) { return null; }
 
 		Map<Path, Map<String, Map<String, Variant>>> bluezManagedObject = bluezObjectManager.GetManagedObjects();

@@ -4,6 +4,7 @@ import it.tangodev.ble.BleCharacteristic;
 import it.tangodev.ble.BleService;
 import it.tangodev.ble.BleCharacteristicListener;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class ExampleCharacteristic extends BleCharacteristic implements GattChar
 			@Override
 			public void setValue(byte[] value) {
 				try {
-					exampleValue = new String(value, "UTF8");
+					exampleValue = new String(value, StandardCharsets.UTF_8);
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
@@ -37,7 +38,7 @@ public class ExampleCharacteristic extends BleCharacteristic implements GattChar
 			@Override
 			public byte[] getValue() {
 				try {
-					return exampleValue.getBytes("UTF8");
+					return exampleValue.getBytes(StandardCharsets.UTF_8);
 				} catch(Exception e) {
 					throw new RuntimeException(e);
 				}

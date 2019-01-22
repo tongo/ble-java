@@ -7,6 +7,7 @@ import it.tangodev.ble.BleCharacteristic.CharacteristicFlag;
 import it.tangodev.ble.BleCharacteristicListener;
 import it.tangodev.ble.BleService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +16,9 @@ import org.freedesktop.dbus.exceptions.DBusException;
 public class ExampleMain implements Runnable {
 	
 	protected String valueString = "Ciao ciao";
-	BleApplication app;
-	BleService service;
-	BleCharacteristic characteristic;
+	private BleApplication app;
+	private BleService service;
+	private BleCharacteristic characteristic;
 
 	public void notifyBle(String value) {
 		this.valueString = value;
@@ -47,7 +48,7 @@ public class ExampleMain implements Runnable {
 			@Override
 			public void setValue(byte[] value) {
 				try {
-					valueString = new String(value, "UTF8");
+					valueString = new String(value, StandardCharsets.UTF_8);
 				} catch(Exception e) {
 					System.out.println("");
 				}
@@ -56,7 +57,7 @@ public class ExampleMain implements Runnable {
 			@Override
 			public byte[] getValue() {
 				try {
-					return valueString.getBytes("UTF8");
+					return valueString.getBytes(StandardCharsets.UTF_8);
 				} catch(Exception e) {
 					throw new RuntimeException(e);
 				}

@@ -6,6 +6,6 @@ package it.tangodev.ble;
  *
  */
 public interface BleCharacteristicListener {
-	public byte[] getValue();
-	public void setValue(byte[] value);
+	byte[] getValue();
+	void setValue(byte[] value);
 }

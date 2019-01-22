@@ -24,10 +24,10 @@ public class BleService implements GattService1, Properties {
 	private static final String SERVICE_PRIMARY_PROPERTY_KEY = "Primary";
 	private static final String SERVICE_CHARACTERISTIC_PROPERTY_KEY = "Characteristics";
 	
-	private String uuid = null;
-	private Boolean primary = true;
+	private String uuid;
+	private Boolean primary;
 	private List<BleCharacteristic> characteristics = new ArrayList<BleCharacteristic>();
-	private String path = null;
+	private String path;
 	
 	/**
 	 * Remember that the path need to have this format APPLICATION/SERVICE

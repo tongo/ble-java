@@ -14,7 +14,7 @@ import org.freedesktop.dbus.exceptions.DBusException;
 public interface PropertiesChangedSignal extends DBusInterface {
 
 	@DBusMemberName("PropertiesChanged")
-	public static class PropertiesChanged extends DBusSignal {
+	class PropertiesChanged extends DBusSignal {
 		private final String iface;
 		private final Map<String, Variant> propertiesChanged;
 		private final List<String> propertiesRemoved;
