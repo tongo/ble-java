@@ -141,11 +141,11 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	/**
 	 * Call this method to send a notification to a central.
 	 */
-	public void sendNotification() {
+	public void sendNotification(String devicePath) {
 		try {
 			DBusConnection dbusConnection = DBusConnection.getConnection(DBusConnection.SYSTEM);
 			
-			Variant<byte[]> signalValueVariant = new Variant<byte[]>(listener.getValue());
+			Variant<byte[]> signalValueVariant = new Variant<byte[]>(getValue(devicePath));
 			Map<String, Variant> signalValue = new HashMap<String, Variant>();
 			signalValue.put(BleCharacteristic.CHARACTERISTIC_VALUE_PROPERTY_KEY, signalValueVariant);
 			
@@ -169,12 +169,15 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	public byte[] ReadValue(Map<String, Variant> option) {
 		System.out.println("Characteristic Read option[" + option + "]");
 		int offset = 0;
-		if(option.get("offset") != null) {
+		if(option.containsKey("offset")) {
 			Variant<UInt16> voffset = option.get("offset");
 			offset = (voffset.getValue() != null) ? voffset.getValue().intValue() : offset;
 		}
-		
-		byte[] valueBytes = listener.getValue();
+
+		String devicePath = null;
+		devicePath = stringVariantToString(option, devicePath);
+
+		byte[] valueBytes = getValue(devicePath);
 		byte[] slice = Arrays.copyOfRange(valueBytes, offset, valueBytes.length);
 		return slice;
 	}
@@ -185,7 +188,31 @@ public class BleCharacteristic implements GattCharacteristic1, Properties {
 	@Override
 	public void WriteValue(byte[] value, Map<String, Variant> option) {
 		System.out.println("Characteristic Write option[" + option + "]");
-		listener.setValue(value);
+		int offset = 0;
+		if(option.containsKey("offset")) {
+			Variant<UInt16> voffset = option.get("offset");
+			offset = (voffset.getValue() != null) ? voffset.getValue().intValue() : offset;
+		}
+
+		String devicePath = null;
+		setValue(stringVariantToString(option, devicePath), offset, value);
+	}
+
+	protected String stringVariantToString(Map<String, Variant> option, String devicePath) {
+		if (option.containsKey("device")) {
+			Variant<Path> pathVariant = null;
+			pathVariant = option.get("pathVariant");
+			if (pathVariant != null) devicePath = pathVariant.getValue().getPath();
+		}
+		return devicePath;
+	}
+
+	protected byte[] getValue(String devicePath) {
+		return listener.getValue(devicePath);
+	}
+
+	protected void setValue(String devicePath, int offset, byte[] value) {
+		listener.setValue(devicePath, offset, value);
 	}
 
 	@Override

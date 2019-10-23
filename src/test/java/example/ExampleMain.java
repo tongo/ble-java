@@ -21,19 +21,19 @@ public class ExampleMain implements Runnable {
 
 	public void notifyBle(String value) {
 		this.valueString = value;
-		characteristic.sendNotification();
+		characteristic.sendNotification(null);
 	}
 	
 	public ExampleMain() throws DBusException, InterruptedException {
 		BleApplicationListener appListener = new BleApplicationListener() {
 			@Override
-			public void deviceDisconnected() {
-				System.out.println("Device disconnected");
+			public void deviceDisconnected(String path) {
+				System.out.println("Device disconnected: " + path);
 			}
 			
 			@Override
-			public void deviceConnected() {
-				System.out.println("Device connected");
+			public void deviceConnected(String path, String address) {
+				System.out.println("Device connected: " + path + " ADDR: " + address);
 			}
 		};
 		app = new BleApplication("/tango", appListener);
@@ -45,7 +45,7 @@ public class ExampleMain implements Runnable {
 		
 		characteristic = new BleCharacteristic("/tango/s/c", service, flags, "13333333-3333-3333-3333-333333333002", new BleCharacteristicListener() {
 			@Override
-			public void setValue(byte[] value) {
+			public void setValue(String devicePath, int offset, byte[] value) {
 				try {
 					valueString = new String(value, "UTF8");
 				} catch(Exception e) {
@@ -54,7 +54,7 @@ public class ExampleMain implements Runnable {
 			}
 			
 			@Override
-			public byte[] getValue() {
+			public byte[] getValue(String devicePath) {
 				try {
 					return valueString.getBytes("UTF8");
 				} catch(Exception e) {
@@ -68,6 +68,7 @@ public class ExampleMain implements Runnable {
 		ExampleCharacteristic exampleCharacteristic = new ExampleCharacteristic(service);
 		service.addCharacteristic(exampleCharacteristic);
 		app.start();
+		System.out.println("Lisenting on adapter " + app.getBleAdapter().getAddress() + " path: " + app.getBleAdapter().getPath());
 	}
 
 	@Override
@@ -88,13 +89,13 @@ public class ExampleMain implements Runnable {
 		System.out.println("");
 //		Thread t = new Thread(example);
 //		t.start();
-//		Thread.sleep(15000);
+		Thread.sleep(15000);
 		example.notifyBle("woooooo");
-//		Thread.sleep(15000);
+		Thread.sleep(15000);
 //		t.notify();
 
-//		Thread.sleep(5000);
-//		System.out.println("stopping application");
+		Thread.sleep(5000);
+		System.out.println("stopping application");
 		example.getApp().stop();
 		System.out.println("Application stopped");
 	}

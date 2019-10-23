@@ -10,7 +10,7 @@
 .project
 .classpath
 
-# ignore the intelliJ project file
+# ignore JetBrains IntilliJ project files
 /out
 /classes
 *.iml
