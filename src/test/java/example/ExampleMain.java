@@ -18,7 +18,7 @@ public class ExampleMain implements Runnable {
 	BleApplication app;
 	BleService service;
 	BleCharacteristic characteristic;
-	
+
 	public void notifyBle(String value) {
 		this.valueString = value;
 		characteristic.sendNotification(null);
@@ -79,16 +79,25 @@ public class ExampleMain implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public BleApplication getApp() {
+		return app;
+	}
+
 	public static void main(String[] args) throws DBusException, InterruptedException {
 		ExampleMain example = new ExampleMain();
 		System.out.println("");
 //		Thread t = new Thread(example);
 //		t.start();
-//		Thread.sleep(15000);
-//		example.notifyBle("woooooo");
-//		Thread.sleep(15000);
+		Thread.sleep(15000);
+		example.notifyBle("woooooo");
+		Thread.sleep(15000);
 //		t.notify();
+
+		Thread.sleep(5000);
+		System.out.println("stopping application");
+		example.getApp().stop();
+		System.out.println("Application stopped");
 	}
 	
 }

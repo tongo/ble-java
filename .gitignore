@@ -1,5 +1,9 @@
 /.gradle/
 /build
+/classes
+/out
+/.idea
+/*.iml
 
 # ignore the eclipse project file
 .settings
@@ -7,5 +11,7 @@
 .classpath
 
 # ignore JetBrains IntilliJ project files
-.idea/
-ble-java.iml
+/out
+/classes
+*.iml
+/.idea
